@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>10</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>COMPOSE_PROJECT_NAME</name>
+          <description>Name of the created instance to be created by this build.</description>
+          <defaultValue>appsetup</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.4.0">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/petyodimitrov/app-setup.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <jenkins.triggers.ReverseBuildTrigger>
+      <spec></spec>
+      <upstreamProjects>build-spring-demo, </upstreamProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+        <completeBuild>true</completeBuild>
+      </threshold>
+    </jenkins.triggers.ReverseBuildTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>echo &quot;remove running &apos;${COMPOSE_PROJECT_NAME}&apos; containers&quot;
+docker-compose stop -t 60
+docker-compose rm -f</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>echo &quot;clean old &apos;${COMPOSE_PROJECT_NAME}&apos; images&quot;
+docker images | grep &quot;$COMPOSE_PROJECT_NAME\_&quot; | awk &quot;{print \$3}&quot; | xargs --no-run-if-empty docker rmi -f &gt; /dev/null 2&gt;&amp;1 || true
+
+echo &quot;build new &apos;${COMPOSE_PROJECT_NAME}&apos; images&quot;
+docker-compose build
+
+echo &quot;clean dangling untagged images&quot;
+docker images | grep &quot;&lt;none&gt;&quot; | awk &quot;{print \$3}&quot; | xargs --no-run-if-empty docker rmi -f &gt; /dev/null 2&gt;&amp;1 || true
+</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>echo &quot;start &apos;${COMPOSE_PROJECT_NAME}&apos; containers&quot;
+docker-compose up -d</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>echo &quot;test infrastructure&quot;
+#sleep 1m
+echo &quot;push images if tests passes&quot;</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>
