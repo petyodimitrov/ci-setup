@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo starting services...
 /opt/bin/entry_point.sh > /dev/null 2&>1 &
 echo started

@@ -55,4 +55,5 @@ registryui:
   - ENV_MODE_BROWSE_ONLY=true
  ports:
   - 9082:80
- hostname: "registry-ui" 
+ hostname: "registry-ui"
+ restart: always 

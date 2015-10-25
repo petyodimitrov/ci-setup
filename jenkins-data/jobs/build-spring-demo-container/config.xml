@@ -99,7 +99,20 @@ docker run -t --rm -p 5900:5900 -p 4444:4444 cisetup_seleniumfirefoxtest bash /t
 </command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
-      <command>echo &quot;push images if everything is successful&quot;</command>
+      <command>#!/bin/bash
+
+echo &quot;push images if everything is successful&quot;
+docker images | grep &quot;^$COMPOSE_PROJECT_NAME\_&quot; | awk &apos;{ print &quot;localhost:9500/&quot; $1 &quot;:1.0&quot; }&apos; | xargs -L1 docker rmi &gt;&gt; /dev/null 2&amp;&gt;1
+
+docker images | grep &quot;^$COMPOSE_PROJECT_NAME\_&quot; | awk &apos;{ print $3, &quot;localhost:9500/&quot; $1 &quot;:1.0&quot; }&apos; | xargs -L1 echo docker tag -f
+docker images | grep &quot;^$COMPOSE_PROJECT_NAME\_&quot; | awk &apos;{ print $3, &quot;localhost:9500/&quot; $1 &quot;:1.0&quot; }&apos; | xargs -L1 docker tag -f
+
+docker images | grep &quot;^localhost:9500/$COMPOSE_PROJECT_NAME\_&quot; | awk &apos;{ print $1 &quot;:&quot; $2 }&apos; | xargs -L1 echo docker push
+
+# push a single image to registry (to save time)
+#docker images | grep &quot;^localhost:9500/$COMPOSE_PROJECT_NAME\_&quot; | awk &apos;{ print $1 &quot;:&quot; $2 }&apos; | xargs -L1 docker push &gt;&gt; /dev/null 2&amp;&gt;1
+image=&quot;localhost:9500/${COMPOSE_PROJECT_NAME}_proxy:1.0&quot;
+docker push $image</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

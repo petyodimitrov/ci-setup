@@ -17,7 +17,7 @@ RUN chown -R jenkins:jenkins /var/log/jenkins
 RUN chown -R jenkins:jenkins /var/cache/jenkins
 
 # Set Defaults
-ENV JAVA_OPTS="-Xmx8192m"
+ENV JAVA_OPTS="-Xmx6144m"
 ENV JENKINS_OPTS="--handlerCountStartup=100 --handlerCountMax=300 --webroot=/var/cache/jenkins/war"
 # for now removed option "--logfile=/var/log/jenkins/jenkins.log"
 
