@@ -39,8 +39,8 @@ registry: http://192.168.99.100:9082/
 
 spring-music:  http://192.168.99.100
 nginx:         http://192.168.99.100/nginx_status
-app-node-1:    http://192.168.99.100:8180/manager (admin: admin)
-app-node-2:    http://192.168.99.100:8280/manager (admin: admin)
+app-node-1:    http://192.168.99.100:8180/manager (admin: passw0rd)
+app-node-2:    http://192.168.99.100:8280/manager (admin: passw0rd)
 Kibana:        http://192.168.99.100:8081
 Elasticsearch: http://192.168.99.100:8082
 Elasticsearch: http://192.168.99.100:8082/_status?pretty
