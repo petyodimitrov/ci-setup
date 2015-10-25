@@ -14,7 +14,7 @@ Demo is tested with:
 		* Kitematic 0.8.7 alpha (https://github.com/kitematic/kitematic/releases)
 	* Docker Compose (https://github.com/docker/compose/releases/tag/1.5.0rc1)	
 
-PROBLEMS:
+*PROBLEMS:*
 * docker toolbox: virtual box update corrupted the vboxdrv system driver and had to reinstall it and set VBoxManage to PATH (probably due to incorrect paths in registry)
 * docker toolbox: need to manually set msysgit's ssh executable to PATH
 * environment variables sometimes get lost and need to be reset
@@ -23,7 +23,7 @@ PROBLEMS:
 	- powershell (kitematic)
 	- git-bash (docker quickstart terminal)
 
-COMMANDS:
+*COMMANDS:*
 ```	
 docker-machine create --driver virtualbox --virtualbox-memory 12288 --virtualbox-cpu-count 2  --engine-insecure-registry localhost:9500 default
 docker-machine stop default
@@ -32,16 +32,22 @@ docker-machine start default
 docker-machine ip default
 docker-machine env --shell powershell default | Invoke-Expression
 ```	
+*URLS*
+jenkins:  http://192.168.99.100:9080/
+nexus:    http://192.168.99.100:9081/
+registry: http://192.168.99.100:9082/
+
+spring-music:  http://192.168.99.100
+nginx:         http://192.168.99.100/nginx_status
+app-node-1:    http://192.168.99.100:8180/manager (admin: admin)
+app-node-2:    http://192.168.99.100:8280/manager (admin: admin)
+Kibana:        http://192.168.99.100:8081
+Elasticsearch: http://192.168.99.100:8082
+Elasticsearch: http://192.168.99.100:8082/_status?pretty
+Logspout:      http://192.168.99.100:8083/logs
 
 
-
-
-
-
-
-
-
-COMMANDS USED DURING SETUP:
+*COMMANDS USED DURING SETUP:*
 ```	
 # jenkins
 docker run --name jenkins-config -v /var/jenkins_home --entrypoint /bin/echo jenkins data-only container for jenkins
@@ -115,8 +121,8 @@ function wait_for_proxy() {
 }
 ```	
 
-NOTES TO SELF:
-1) dangling volumes can be forgotten if -v is not used upon deletion (pending volume management improvement)
-2) for now kitematic's support on windows is alpha and lacks multi-docker machine support
-3) when building with external files beware of EOL
-4) nexus rest API
+*NOTES TO SELF:*
+1. dangling volumes can be forgotten if -v is not used upon deletion (pending volume management improvement)
+2. for now kitematic's support on windows is alpha and lacks multi-docker machine support
+3. when building with external files beware of EOL
+4. nexus rest API
