@@ -71,13 +71,35 @@ docker images | grep &quot;&lt;none&gt;&quot; | awk &quot;{print \$3}&quot; | xa
 </command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
-      <command>echo &quot;start &apos;${COMPOSE_PROJECT_NAME}&apos; containers&quot;
-docker-compose up -d</command>
+      <command>#!/bin/bash -e
+
+echo &quot;start &apos;${COMPOSE_PROJECT_NAME}&apos; containers&quot;
+docker-compose up -d
+
+
+function wait_for_proxy() {
+   echo &quot;wait for $1 proxy to appear (makes $2 attempts every 5s)&quot;
+   COUNTER=1
+   FAILED=0
+   until $(curl --output /dev/null --silent --head --fail $1); do
+      printf &apos;.&apos;
+      sleep 5
+      let COUNTER=COUNTER+1
+      if [ $COUNTER -gt $2 ]; then
+             return 1
+      fi
+   done
+   return 0
+}
+wait_for_proxy &quot;http://${COMPOSE_PROJECT_NAME}_proxy_1&quot; 20</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
-      <command>echo &quot;test infrastructure&quot;
-#sleep 1m
-echo &quot;push images if tests passes&quot;</command>
+      <command>echo &quot;test &apos;${COMPOSE_PROJECT_NAME}&apos; installation&quot;
+docker run -t --rm -p 5900:5900 -p 4444:4444 cisetup_seleniumfirefoxtest bash /test.sh
+</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>echo &quot;push images if everything is successful&quot;</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

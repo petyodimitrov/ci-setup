@@ -22,8 +22,37 @@ jenkins:
   - /usr/local/bin/docker:/usr/bin/docker:ro
  ports:
   - "9080:8080"
+ links:
+  - registry  
  privileged: true
  hostname: "jenkins-server"
 
 mavenbuild:
  build: maven-build
+ 
+seleniumfirefoxtest:
+ build: selenium-firefox-test
+ 
+registry:
+ image: registry:2
+ volumes:
+  - /var/lib/registry:/var/lib/registry
+ ports:
+  - "9500:5000"
+ hostname: "registry-server" 
+ 
+registryui:
+ image: konradkleine/docker-registry-frontend:v2
+ volumes:
+  - /var/lib/registry:/var/lib/registry
+ ports:
+  - "9500:5000"
+ links:
+  - registry
+ environment:
+  - ENV_DOCKER_REGISTRY_HOST=registry-server
+  - ENV_DOCKER_REGISTRY_PORT=5000
+  - ENV_MODE_BROWSE_ONLY=true
+ ports:
+  - 9082:80
+ hostname: "registry-ui" 
