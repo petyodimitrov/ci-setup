@@ -14,15 +14,6 @@ Demo is tested with:
     * Kitematic 0.8.7 alpha (https://github.com/kitematic/kitematic/releases)
 * Docker Compose (https://github.com/docker/compose/releases/tag/1.5.0rc1)	
 
-**PROBLEMS:**
-* docker toolbox: virtual box update corrupted the vboxdrv system driver and had to reinstall it and set VBoxManage to PATH (probably due to incorrect paths in registry)
-* docker toolbox: need to manually set msysgit's ssh executable to PATH
-* environment variables sometimes get lost and need to be reset
-* docker cli can be run via:
-	- standard cmd
-	- powershell (kitematic)
-	- git-bash (docker quickstart terminal)
-
 **COMMANDS:**
 ```	
 docker-machine create --driver virtualbox --virtualbox-memory 12288 --virtualbox-cpu-count 2  --engine-insecure-registry localhost:9500 default
@@ -48,6 +39,14 @@ Runtime:
 * Elasticsearch: http://192.168.99.100:8082/_status?pretty
 * Logspout:      http://192.168.99.100:8083/logs
 
+**PROBLEMS:**
+* docker toolbox: virtual box update corrupted the vboxdrv system driver and had to reinstall it and set VBoxManage to PATH (probably due to incorrect paths in registry)
+* docker toolbox: need to manually set msysgit's ssh executable to PATH
+* environment variables sometimes get lost and need to be reset
+* docker cli can be run via:
+	- standard cmd
+	- powershell (kitematic)
+	- git-bash (docker quickstart terminal)
 
 **COMMANDS USED DURING SETUP:**
 ```	
