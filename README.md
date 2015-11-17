@@ -4,15 +4,15 @@ It includes Jenkins and Nexus container images (each with a data container image
 The preconfigured Jenkins job pulls the application's source code from GitHub, starts an ephimeral Maven container that builds, packages and deploys the application to Nexus.
 
 Demo is tested with: 
-	* Windows 7 
-	* Docker Toolkit 1.8.3 (https://github.com/docker/toolbox/releases/download/v1.8.3/DockerToolbox-1.8.3.exe), including
-		* VirtualBox 5.0.6
-		* Docker engine 1.8.3
-		* Docker API 1.20
-		* Docker client for Windows
-		* Boot2Docker 4.1.10
-		* Kitematic 0.8.7 alpha (https://github.com/kitematic/kitematic/releases)
-	* Docker Compose (https://github.com/docker/compose/releases/tag/1.5.0rc1)	
+* Windows 7 
+* Docker Toolkit 1.8.3 (https://github.com/docker/toolbox/releases/download/v1.8.3/DockerToolbox-1.8.3.exe), including
+* VirtualBox 5.0.6
+    * Docker engine 1.8.3
+    * Docker API 1.20
+    * Docker client for Windows
+    * Boot2Docker 4.1.10
+    * Kitematic 0.8.7 alpha (https://github.com/kitematic/kitematic/releases)
+* Docker Compose (https://github.com/docker/compose/releases/tag/1.5.0rc1)	
 
 **PROBLEMS:**
 * docker toolbox: virtual box update corrupted the vboxdrv system driver and had to reinstall it and set VBoxManage to PATH (probably due to incorrect paths in registry)
