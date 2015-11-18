@@ -38,6 +38,7 @@ Runtime:
 * Elasticsearch: http://192.168.99.100:8082
 * Elasticsearch: http://192.168.99.100:8082/_status?pretty
 * Logspout:      http://192.168.99.100:8083/logs
+* VNC:           vnc://192.168.99.100:5900 (secret)
 
 **PROBLEMS:**
 * docker toolbox: virtual box update corrupted the vboxdrv system driver and had to reinstall it and set VBoxManage to PATH (probably due to incorrect paths in registry)
@@ -103,7 +104,8 @@ docker rmi -f $(docker images | grep "<none>" | awk "{print \$3}")
 java -XX:-UseSplitVerifier -cp target/spring-music-1.0-SNAPSHOT-test-jar-with-dependencies.jar org.junit.runner.JUnitCore org.cloudfoundry.samples.music.config.geb.DemoSpec
 
 # run selenium image
-docker run -it --rm -p 5900:5900 -p 4444:4444 se bash /test.sh
+docker run -ti --rm -p 5900:5900 -p 4444:4444 cisetup_seleniumfirefoxtest bash /test.sh
+
 
 # function that waits for proxy to start
 #!/bin/bash -e
