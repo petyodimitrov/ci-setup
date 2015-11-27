@@ -47,5 +47,7 @@ docker run --rm --volumes-from cisetup_jenkinsdata_1 -v /opt/maven/repo:/root/.m
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
-  <buildWrappers/>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.7.2"/>
+  </buildWrappers>
 </project>
