@@ -5,29 +5,29 @@ The preconfigured Jenkins job pulls the application's source code from GitHub, s
 
 Demo is tested with: 
 * Windows 7 
-* Docker Toolkit 1.8.3 (https://github.com/docker/toolbox/releases/download/v1.8.3/DockerToolbox-1.8.3.exe), including
-* VirtualBox 5.0.6
-    * Docker engine 1.8.3
-    * Docker API 1.20
-    * Docker client for Windows
-    * Boot2Docker 4.1.10
-    * Kitematic 0.8.7 alpha (https://github.com/kitematic/kitematic/releases)
-* Docker Compose (https://github.com/docker/compose/releases/tag/1.5.0rc1)	
+* Docker Toolkit 1.11.1b (https://github.com/docker/toolbox/releases): 
+	* docker 1.11.1	(https://github.com/docker/docker/releases)
+	* docker-machine 0.7.0 (https://github.com/docker/machine/releases)
+	* docker-compose 1.7.1 (https://github.com/docker/compose/releases)
+	* Kitematic 0.10.2 (https://github.com/kitematic/kitematic/releases)
+	* Boot2Docker ISO 1.11.1 (https://github.com/boot2docker/boot2docker/releases)
+	* VirtualBox 5.0.20
 
 **COMMANDS:**
 ```	
-docker-machine create --driver virtualbox --virtualbox-memory 12288 --virtualbox-cpu-count 2  --engine-insecure-registry localhost:9500 default
-docker-machine stop default
+docker-machine create --driver virtualbox --virtualbox-memory 12288 --virtualbox-cpu-count 2 default
+docker-machine stop
 VBoxManage modifyvm "default" --vram 128
-docker-machine start default
-docker-machine ip default
-docker-machine env --shell powershell default | Invoke-Expression
+docker-machine start 
+docker-machine ip
+docker-machine env | Invoke-Expression
 ```	
+
 **URLS**
 Infrastructure:
 * jenkins:  http://192.168.99.100:9080/
 * nexus:    http://192.168.99.100:9081/ (admin/admin123)
-* registry: http://192.168.99.100:9082/
+* registry: http://192.168.99.100:9581/
 
 Runtime:
 * spring-music:  http://192.168.99.100

@@ -43,7 +43,7 @@ to docker</description>
       <command># run th maven build with two mounts:
 # 1) worskpace of jenkins to access source code
 # 2) host directory for local maven repo to act as cache
-docker run --rm --volumes-from cisetup_jenkinsdata_1 -v /opt/maven/repo:/root/.m2/repository --link cisetup_nexus_1 cisetup_mavenbuild mvn -Drepository.address=cisetup_nexus_1:8081 -f ${WORKSPACE}/pom.xml clean deploy</command>
+docker run --rm --volumes-from cisetup_jenkinsdata_1 -v /c/Users/Petyo/.demo/maven-repo:/root/.m2/repository --net cisetup_default cisetup_mavenbuild mvn -D"repository.address=nexus:8081" -f ${WORKSPACE}/pom.xml clean deploy</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

@@ -9,8 +9,8 @@
   <servers>
 		<server>
 			<id>nexus-deployment</id>
-			<username>deployment</username>
-			<password>deployment123</password>
+			<username>admin</username>
+			<password>admin123</password>
 			<filePermissions>664</filePermissions>
 			<directoryPermissions>775</directoryPermissions>
 			<configuration/>

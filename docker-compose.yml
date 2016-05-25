@@ -1,59 +1,42 @@
-nexusdata:
- image: sonatype/nexus:2.11.4-01
- command: echo "data-only container for Nexus"
- 
-nexus:
- image: sonatype/nexus:2.11.4-01
- volumes_from:
-  - nexusdata
- ports:
-  - "9081:8081"
- hostname: "nexus-server"
+version: '2'
 
-jenkinsdata:
- build: jenkins-data
-
-jenkins:
- build: jenkins
- volumes_from:
-  - jenkinsdata
- volumes:
-  - /var/run/docker.sock:/var/run/docker.sock:ro
-  - /usr/local/bin/docker:/usr/bin/docker:ro
- ports:
-  - "9080:8080"
- links:
-  - registry  
- privileged: true
- hostname: "jenkins-server"
-
-mavenbuild:
- build: maven-build
+services:
+ nexusdata:
+  image: sonatype/nexus:2.13.0-01
+  command: echo "data-only container for Nexus"
+  
+ nexus:
+  image: sonatype/nexus:2.13.0-01
+  volumes_from:
+   - nexusdata
+  ports:
+   - "9081:8081"
+  hostname: "nexus-server"
+  
+ registry:
+  build: registry
+  ports:
+   - "9581:8081"
+   - "9543-9545:8443-8445"
+  hostname: "registry-server" 
  
-seleniumfirefoxtest:
- build: selenium-firefox-test
+ jenkinsdata:
+  build: jenkins-data
  
-registry:
- image: registry:2
- volumes:
-  - /var/lib/registry:/var/lib/registry
- ports:
-  - "9500:5000"
- hostname: "registry-server" 
+ jenkins:
+  build: jenkins
+  volumes_from:
+   - jenkinsdata
+  volumes:
+   - /var/run/docker.sock:/var/run/docker.sock:ro
+   - /usr/local/bin/docker:/usr/bin/docker:ro
+  ports:
+   - "9080:8080"
+  privileged: true
+  hostname: "jenkins-server"
  
-registryui:
- image: konradkleine/docker-registry-frontend:v2
- volumes:
-  - /var/lib/registry:/var/lib/registry
- ports:
-  - "9500:5000"
- links:
-  - registry
- environment:
-  - ENV_DOCKER_REGISTRY_HOST=registry-server
-  - ENV_DOCKER_REGISTRY_PORT=5000
-  - ENV_MODE_BROWSE_ONLY=true
- ports:
-  - 9082:80
- hostname: "registry-ui"
- restart: always 
+ mavenbuild:
+  build: maven-build
+  
+ seleniumfirefoxtest:
+  build: selenium-firefox-test

@@ -2,14 +2,16 @@
 <project>
   <actions/>
   <description></description>
-  <logRotator class="hudson.tasks.LogRotator">
-    <daysToKeep>-1</daysToKeep>
-    <numToKeep>10</numToKeep>
-    <artifactDaysToKeep>-1</artifactDaysToKeep>
-    <artifactNumToKeep>-1</artifactNumToKeep>
-  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>10</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
@@ -55,64 +57,59 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>echo &quot;remove running &apos;${COMPOSE_PROJECT_NAME}&apos; containers&quot;
+      <command>echo &quot;\n\n\n\n~~ remove running &apos;${COMPOSE_PROJECT_NAME}&apos; containers \n\n\n\n&quot;
 docker-compose stop -t 60
-docker-compose rm -f</command>
+docker-compose rm -f -v</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
-      <command>echo &quot;clean old &apos;${COMPOSE_PROJECT_NAME}&apos; images&quot;
+      <command>echo  &quot;\n\n\n\n~~ clean old &apos;${COMPOSE_PROJECT_NAME}&apos; images \n\n\n\n&quot;
 docker images | grep &quot;$COMPOSE_PROJECT_NAME\_&quot; | awk &quot;{print \$3}&quot; | xargs --no-run-if-empty docker rmi -f &gt; /dev/null 2&gt;&amp;1 || true
 
-echo &quot;build new &apos;${COMPOSE_PROJECT_NAME}&apos; images&quot;
+echo &quot;\n\n\n\n~~ build new &apos;${COMPOSE_PROJECT_NAME}&apos; images \n\n\n\n&quot;
 docker-compose build
 
-echo &quot;clean dangling untagged images&quot;
+echo &quot;\n\n\n\n~~ clean dangling untagged images \n\n\n\n&quot;
 docker images | grep &quot;&lt;none&gt;&quot; | awk &quot;{print \$3}&quot; | xargs --no-run-if-empty docker rmi -f &gt; /dev/null 2&gt;&amp;1 || true
 </command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
       <command>#!/bin/bash -e
-
-echo &quot;start &apos;${COMPOSE_PROJECT_NAME}&apos; containers&quot;
+echo -e &quot;\n\n\n\n~~ start &apos;${COMPOSE_PROJECT_NAME}&apos; containers \n\n\n\n&quot;
 docker-compose up -d
-
-
-function wait_for_proxy() {
-   echo &quot;wait for $1 proxy to appear (makes $2 attempts every 5s)&quot;
-   COUNTER=1
-   FAILED=0
-   until $(curl --output /dev/null --silent --head --fail $1); do
-      printf &apos;.&apos;
-      sleep 5
-      let COUNTER=COUNTER+1
-      if [ $COUNTER -gt $2 ]; then
-             return 1
-      fi
-   done
-   return 0
-}
-wait_for_proxy &quot;http://${COMPOSE_PROJECT_NAME}_proxy_1&quot; 20</command>
+</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
-      <command>echo &quot;test &apos;${COMPOSE_PROJECT_NAME}&apos; installation&quot;
-docker run -t --rm -p 5900:5900 -p 4444:4444 cisetup_seleniumfirefoxtest bash /test.sh
+      <command>#!/bin/bash
+	  
+echo -e &quot;\n\n\n\n~~ waiting for containers to start \n\n\n\n&quot;
+docker run -t --rm --net appsetup_default cisetup_seleniumfirefoxtest bash /wait.sh http://proxy 20
+
+echo -e &quot;\n\n\n\n~~ test &apos;${COMPOSE_PROJECT_NAME}&apos; containers \n\n\n\n&quot;
+docker rm -f ui_tests &gt;&gt; /dev/null 2&amp;&gt;1
+docker create -t -p 5900:5900 -p 4444:4444 --net cisetup_default -e NEXUS_HOST=nexus -e NEXUS_PORT=8081 --name ui_tests cisetup_seleniumfirefoxtest bash /test.sh
+docker network connect appsetup_default ui_tests
+docker start -a ui_tests
 </command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
 
-echo &quot;push images if everything is successful&quot;
-docker images | grep &quot;^$COMPOSE_PROJECT_NAME\_&quot; | awk &apos;{ print &quot;localhost:9500/&quot; $1 &quot;:1.0&quot; }&apos; | xargs -L1 docker rmi &gt;&gt; /dev/null 2&amp;&gt;1
+echo -e &quot;\n\n\n\n~~ push images to registry \n\n\n\n&quot;
+# tag images
+PREFIX=&quot;localhost:9544&quot;
+docker images | grep &quot;^$COMPOSE_PROJECT_NAME\_&quot; | awk -v prefix=&quot;$PREFIX&quot; &apos;{ print prefix $1 &quot;:1.0&quot; }&apos; | xargs -L1 docker rmi &gt;&gt; /dev/null 2&amp;&gt;1
 
-docker images | grep &quot;^$COMPOSE_PROJECT_NAME\_&quot; | awk &apos;{ print $3, &quot;localhost:9500/&quot; $1 &quot;:1.0&quot; }&apos; | xargs -L1 echo docker tag -f
-docker images | grep &quot;^$COMPOSE_PROJECT_NAME\_&quot; | awk &apos;{ print $3, &quot;localhost:9500/&quot; $1 &quot;:1.0&quot; }&apos; | xargs -L1 docker tag -f
+docker images | grep &quot;^$COMPOSE_PROJECT_NAME\_&quot; | awk -v prefix=&quot;$PREFIX&quot; &apos;{ print $3, prefix &quot;/&quot; $1 &quot;:1.0&quot; }&apos; | xargs -L1 echo docker tag
+docker images | grep &quot;^$COMPOSE_PROJECT_NAME\_&quot; | awk -v prefix=&quot;$PREFIX&quot; &apos;{ print $3, prefix &quot;/&quot; $1 &quot;:1.0&quot; }&apos; | xargs -L1 docker tag
 
-docker images | grep &quot;^localhost:9500/$COMPOSE_PROJECT_NAME\_&quot; | awk &apos;{ print $1 &quot;:&quot; $2 }&apos; | xargs -L1 echo docker push
+docker images | grep &quot;^$PREFIX/$COMPOSE_PROJECT_NAME\_&quot; | awk &apos;{ print $1 &quot;:&quot; $2 }&apos; | xargs -L1 echo docker push
 
 # push a single image to registry (to save time)
-#docker images | grep &quot;^localhost:9500/$COMPOSE_PROJECT_NAME\_&quot; | awk &apos;{ print $1 &quot;:&quot; $2 }&apos; | xargs -L1 docker push &gt;&gt; /dev/null 2&amp;&gt;1
-image=&quot;localhost:9500/${COMPOSE_PROJECT_NAME}_proxy:1.0&quot;
-docker push $image</command>
+#docker images | grep &quot;^$PREFIX/$COMPOSE_PROJECT_NAME\_&quot; | awk &apos;{ print $1 &quot;:&quot; $2 }&apos; | xargs -L1 docker push &gt;&gt; /dev/null 2&amp;&gt;1
+IMAGE=&quot;${PREFIX}/${COMPOSE_PROJECT_NAME}_proxy:1.0&quot;
+docker login -u admin -p admin123 ${PREFIX}
+docker push $IMAGE
+docker logout ${PREFIX}</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
